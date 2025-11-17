@@ -150,7 +150,6 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
           const schedule = currentCategory.schedules?.find((s) => s.month === month)
           return { month, monthName: schedule?.month_name || "" }
         })
-        .sort((a, b) => a.month.localeCompare(b.month))
     : []
 
   const getMonthDayOrder = (month: string) => {

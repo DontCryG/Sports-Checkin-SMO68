@@ -1,8 +1,9 @@
 "use client"
 
-import { LogOut, User, LogIn } from "lucide-react"
+import { LogOut, User, LogIn, LayoutDashboard } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import Link from "next/link"
 
 interface HeaderProps {
   user?: {
@@ -39,6 +40,18 @@ export function Header({ user, onLogout, onLoginClick }: HeaderProps) {
             <div className="flex sm:hidden items-center justify-center rounded-lg bg-muted/50 p-2">
               <User className="h-5 w-5 text-primary" />
             </div>
+            {user.role === "admin" && (
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span className="hidden md:inline">Dashboard</span>
+                </Button>
+              </Link>
+            )}
             <Button
               variant="ghost"
               size="sm"

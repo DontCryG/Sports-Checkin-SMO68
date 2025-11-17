@@ -139,6 +139,73 @@ export async function getFullSportsData() {
   }
 }
 
+export async function createSchedule(categoryId: string, date: string, time: string) {
+  try {
+    const supabase = await createClient()
+
+    // Parse date to get month and day of week in Thai
+    const dateObj = new Date(date)
+    const monthNames = [
+      "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+    ]
+    const dayNames = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"]
+    
+    const month = dateObj.toISOString().slice(0, 7) // YYYY-MM format
+    const monthName = monthNames[dateObj.getMonth()]
+    const dayOfWeek = dayNames[dateObj.getDay()]
+
+    const { data, error } = await supabase
+      .from("schedules")
+      .insert({
+        category_id: categoryId,
+        date,
+        month,
+        month_name: monthName,
+        day_of_week: dayOfWeek,
+        time,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("[v0] Error creating schedule:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/")
+    revalidatePath("/admin")
+    return { success: true, data }
+  } catch (error) {
+    console.error("[v0] Error in createSchedule:", error)
+    return { success: false, error: "Failed to create schedule" }
+  }
+}
+
+export async function deleteSchedule(scheduleId: string) {
+  try {
+    const supabase = await createClient()
+
+    // First delete all athletes associated with this schedule
+    await supabase.from("athletes").delete().eq("schedule_id", scheduleId)
+
+    // Then delete the schedule
+    const { error } = await supabase.from("schedules").delete().eq("id", scheduleId)
+
+    if (error) {
+      console.error("[v0] Error deleting schedule:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/")
+    revalidatePath("/admin")
+    return { success: true }
+  } catch (error) {
+    console.error("[v0] Error in deleteSchedule:", error)
+    return { success: false, error: "Failed to delete schedule" }
+  }
+}
+
 export async function addAthlete(scheduleId: string, name: string, number: string, faculty: string) {
   try {
     const supabase = await createClient()

@@ -40,3 +40,5 @@ export interface Sport {
   categories?: Category[]
   created_at?: string
 }
+
+export type FullSportsData = Sport[]
