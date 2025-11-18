@@ -272,3 +272,74 @@ export async function deleteAthlete(athleteId: string) {
     return { success: false, error: "Failed to delete athlete" }
   }
 }
+
+export async function createCategory(
+  sportId: string,
+  name: string,
+  subcategory: string,
+  color?: string,
+  icon?: string,
+  scheduleText?: string
+) {
+  try {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({
+        sport_id: sportId,
+        name,
+        subcategory: subcategory || "-", // Use "-" if empty
+        color: color || "#3b82f6",
+        icon: icon || "calendar",
+        schedule_text: scheduleText || "-", // Add default schedule_text
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("[v0] Error creating category:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/")
+    revalidatePath("/admin")
+    return { success: true, data }
+  } catch (error) {
+    console.error("[v0] Error in createCategory:", error)
+    return { success: false, error: "Failed to create category" }
+  }
+}
+
+export async function deleteCategory(categoryId: string) {
+  try {
+    const supabase = await createClient()
+
+    // First get all schedules for this category
+    const { data: schedules } = await supabase.from("schedules").select("id").eq("category_id", categoryId)
+
+    // Delete all athletes for these schedules
+    if (schedules && schedules.length > 0) {
+      const scheduleIds = schedules.map((s) => s.id)
+      await supabase.from("athletes").delete().in("schedule_id", scheduleIds)
+    }
+
+    // Delete all schedules for this category
+    await supabase.from("schedules").delete().eq("category_id", categoryId)
+
+    // Finally delete the category
+    const { error } = await supabase.from("categories").delete().eq("id", categoryId)
+
+    if (error) {
+      console.error("[v0] Error deleting category:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/")
+    revalidatePath("/admin")
+    return { success: true }
+  } catch (error) {
+    console.error("[v0] Error in deleteCategory:", error)
+    return { success: false, error: "Failed to delete category" }
+  }
+}
