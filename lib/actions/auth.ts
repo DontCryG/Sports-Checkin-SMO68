@@ -8,14 +8,9 @@ export async function loginUser(email: string, password: string) {
     const supabase = await createServerClient()
 
     // Query the users table directly
-    const { data: users, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .limit(1)
+    const { data: users, error } = await supabase.from("users").select("*").eq("email", email).limit(1)
 
     if (error) {
-      console.error("[v0] Database error:", error.message)
       return { success: false, message: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ" }
     }
 
@@ -27,7 +22,7 @@ export async function loginUser(email: string, password: string) {
 
     // Verify password with bcrypt
     const isPasswordValid = await bcrypt.compare(password, user.password_hash)
-    
+
     if (!isPasswordValid) {
       return { success: false, message: "รหัสผ่านไม่ถูกต้อง" }
     }
@@ -43,7 +38,6 @@ export async function loginUser(email: string, password: string) {
       },
     }
   } catch (error) {
-    console.error("[v0] Login error:", error)
     return { success: false, message: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ" }
   }
 }

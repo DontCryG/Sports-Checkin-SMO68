@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Trash2, Calendar, Clock, ArrowLeft, ChevronDown, ChevronRight, FolderPlus } from 'lucide-react'
+import { Plus, Trash2, Calendar, Clock, ArrowLeft, ChevronDown, ChevronRight, FolderPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -58,7 +58,6 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
         alert(result.error || "เกิดข้อผิดพลาด")
       }
     } catch (error) {
-      console.error("Error adding schedule:", error)
       alert("เกิดข้อผิดพลาดในการเพิ่มวันซ้อม")
     } finally {
       setIsLoading(false)
@@ -73,11 +72,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
 
     setIsLoading(true)
     try {
-      const result = await createCategory(
-        newCategorySportId, 
-        newCategoryName, 
-        newCategorySubcategory
-      )
+      const result = await createCategory(newCategorySportId, newCategoryName, newCategorySubcategory)
       if (result.success) {
         alert("เพิ่มหมวดหมู่สำเร็จ!")
         setIsAddCategoryDialogOpen(false)
@@ -89,7 +84,6 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
         alert(result.error || "เกิดข้อผิดพลาด")
       }
     } catch (error) {
-      console.error("Error adding category:", error)
       alert("เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่")
     } finally {
       setIsLoading(false)
@@ -109,7 +103,6 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
         alert(result.error || "เกิดข้อผิดพลาด")
       }
     } catch (error) {
-      console.error("Error deleting category:", error)
       alert("เกิดข้อผิดพลาดในการลบหมวดหมู่")
     } finally {
       setIsLoading(false)
@@ -129,7 +122,6 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
         alert(result.error || "เกิดข้อผิดพลาด")
       }
     } catch (error) {
-      console.error("Error deleting schedule:", error)
       alert("เกิดข้อผิดพลาดในการลบวันซ้อม")
     } finally {
       setIsLoading(false)
@@ -148,7 +140,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
 
   const groupSchedulesByMonth = (schedules: any[]) => {
     if (!schedules) return {}
-    
+
     const grouped: Record<string, any[]> = {}
     schedules.forEach((schedule) => {
       const key = schedule.month
@@ -168,7 +160,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
 
   const formatMonthYear = (month: string, monthName: string) => {
     const [year, monthNum] = month.split("-")
-    const yearBE = parseInt(year) + 543 // แปลงเป็น พ.ศ.
+    const yearBE = Number.parseInt(year) + 543 // แปลงเป็น พ.ศ.
     const cleanMonthName = monthName.split(" ")[0]
     return `${cleanMonthName} ${yearBE}`
   }
@@ -188,7 +180,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
           <p className="text-muted-foreground">จัดการประเภทกีฬาและตารางฝึกซ้อม</p>
         </div>
         <Link href="/">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 bg-transparent">
             <ArrowLeft className="h-4 w-4" />
             กลับหน้าหลัก
           </Button>
@@ -198,7 +190,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
       <div className="mb-6 flex gap-3">
         <Dialog open={isAddCategoryDialogOpen} onOpenChange={setIsAddCategoryDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 bg-transparent">
               <FolderPlus className="h-4 w-4" />
               เพิ่มหมวดหมู่กีฬา
             </Button>
@@ -279,11 +271,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
 
               <div className="space-y-2">
                 <Label>หมวดหมู่</Label>
-                <Select
-                  value={selectedCategoryId}
-                  onValueChange={setSelectedCategoryId}
-                  disabled={!selectedSportId}
-                >
+                <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId} disabled={!selectedSportId}>
                   <SelectTrigger>
                     <SelectValue placeholder="เลือกหมวดหมู่" />
                   </SelectTrigger>
@@ -304,12 +292,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
 
               <div className="space-y-2">
                 <Label>เวลา (เช่น 18:00-20:00)</Label>
-                <Input
-                  type="text"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  placeholder="18:00-20:00"
-                />
+                <Input type="text" value={time} onChange={(e) => setTime(e.target.value)} placeholder="18:00-20:00" />
               </div>
 
               <Button onClick={handleAddSchedule} disabled={isLoading} className="w-full">
@@ -349,16 +332,13 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
                         ลบหมวดหมู่
                       </Button>
                     </div>
-                    
+
                     {monthKeys.length > 0 ? (
                       <div className="space-y-2">
                         {monthKeys.map((monthKey) => {
                           const schedules = groupedSchedules[monthKey]
                           const monthName = schedules[0]?.month_name || monthKey
-                          const totalAthletes = schedules.reduce(
-                            (sum, s) => sum + (s.athletes?.length || 0),
-                            0
-                          )
+                          const totalAthletes = schedules.reduce((sum, s) => sum + (s.athletes?.length || 0), 0)
                           const expandKey = `${category.id}-${monthKey}`
                           const isExpanded = expandedMonths.has(expandKey)
 

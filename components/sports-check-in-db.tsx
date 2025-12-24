@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { CheckCircle2, Circle, Users, Trophy, Calendar, ChevronRight, Eye, Search, Loader2 } from 'lucide-react'
+import { CheckCircle2, Circle, Users, Trophy, Calendar, ChevronRight, Eye, Search, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ExportButtons } from "@/components/export-buttons"
 import { AthleteManager, DeleteAthleteDialog } from "@/components/athlete-manager"
@@ -32,15 +32,15 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
 
   const sortSchedulesByDayOfWeek = (schedules: any[]) => {
     const dayOrder: Record<string, number> = {
-      'จันทร์': 1,
-      'อังคาร': 2,
-      'พุธ': 3,
-      'พฤหัสบดี': 4,
-      'ศุกร์': 5,
-      'เสาร์': 6,
-      'อาทิตย์': 7,
+      จันทร์: 1,
+      อังคาร: 2,
+      พุธ: 3,
+      พฤหัสบดี: 4,
+      ศุกร์: 5,
+      เสาร์: 6,
+      อาทิตย์: 7,
     }
-    
+
     return [...schedules].sort((a, b) => {
       const orderA = dayOrder[a.day_of_week] || 999
       const orderB = dayOrder[b.day_of_week] || 999
@@ -101,7 +101,6 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
     try {
       await toggleAthleteCheckIn(athleteId, !currentStatus)
     } catch (error) {
-      console.error("[v0] Failed to toggle check-in:", error)
       setSports((prevSports) =>
         prevSports.map((sport) => ({
           ...sport,
@@ -129,15 +128,19 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
       const updatedData = await getFullSportsData()
       setSports(updatedData)
     } catch (error) {
-      console.error("[v0] Error refreshing athletes:", error)
+      // Error handling code removed
     }
   }
 
   const totalCategories = sports.reduce((acc, sport) => acc + (sport.categories?.length || 0), 0)
   const totalAthletes = sports.reduce(
     (acc, sport) =>
-      acc + (sport.categories?.reduce((sum, cat) => {
-        return sum + (cat.schedules?.reduce((scheduleSum, schedule) => scheduleSum + (schedule.athletes?.length || 0), 0) || 0)
+      acc +
+      (sport.categories?.reduce((sum, cat) => {
+        return (
+          sum +
+          (cat.schedules?.reduce((scheduleSum, schedule) => scheduleSum + (schedule.athletes?.length || 0), 0) || 0)
+        )
       }, 0) || 0),
     0,
   )
@@ -145,28 +148,27 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
   const currentCategory = sports.flatMap((s) => s.categories || []).find((c) => c.id === selectedCategory)
 
   const availableMonths = currentCategory
-    ? Array.from(new Set(currentCategory.schedules?.map((s) => s.month) || []))
-        .map((month) => {
-          const schedule = currentCategory.schedules?.find((s) => s.month === month)
-          return { month, monthName: schedule?.month_name || "" }
-        })
+    ? Array.from(new Set(currentCategory.schedules?.map((s) => s.month) || [])).map((month) => {
+        const schedule = currentCategory.schedules?.find((s) => s.month === month)
+        return { month, monthName: schedule?.month_name || "" }
+      })
     : []
 
   const getMonthDayOrder = (month: string) => {
     const monthSchedules = currentCategory?.schedules?.filter((s) => s.month === month) || []
     if (monthSchedules.length === 0) return 999
-    
+
     const dayOrder: Record<string, number> = {
-      'จันทร์': 1,
-      'อังคาร': 2,
-      'พุธ': 3,
-      'พฤหัสบดี': 4,
-      'ศุกร์': 5,
-      'เสาร์': 6,
-      'อาทิตย์': 7,
+      จันทร์: 1,
+      อังคาร: 2,
+      พุธ: 3,
+      พฤหัสบดี: 4,
+      ศุกร์: 5,
+      เสาร์: 6,
+      อาทิตย์: 7,
     }
-    
-    const minOrder = Math.min(...monthSchedules.map(s => dayOrder[s.day_of_week] || 999))
+
+    const minOrder = Math.min(...monthSchedules.map((s) => dayOrder[s.day_of_week] || 999))
     return minOrder
   }
 
@@ -177,9 +179,10 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
     return a.month.localeCompare(b.month)
   })
 
-  const monthSchedules = currentCategory && selectedMonth 
-    ? sortSchedulesByDayOfWeek(currentCategory.schedules?.filter((s) => s.month === selectedMonth) || [])
-    : []
+  const monthSchedules =
+    currentCategory && selectedMonth
+      ? sortSchedulesByDayOfWeek(currentCategory.schedules?.filter((s) => s.month === selectedMonth) || [])
+      : []
 
   const currentSchedule = currentCategory?.schedules?.find((s) => s.id === selectedScheduleId)
 

@@ -22,7 +22,6 @@ export function ClientWrapper({ sportsData }: ClientWrapperProps) {
       try {
         setUser(JSON.parse(savedUser))
       } catch (error) {
-        console.error("Failed to parse saved user:", error)
         localStorage.removeItem("sportsCheckInUser")
       }
     }
@@ -47,7 +46,6 @@ export function ClientWrapper({ sportsData }: ClientWrapperProps) {
         alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
       }
     } catch (error) {
-      console.error("Login error:", error)
       alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ")
     }
   }

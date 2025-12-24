@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger, // Added AlertDialogTrigger import
 } from "@/components/ui/alert-dialog"
-import { UserPlus, Edit2, Trash2, Loader2 } from 'lucide-react'
+import { UserPlus, Edit2, Trash2, Loader2 } from "lucide-react"
 import { addAthlete, updateAthlete, deleteAthlete } from "@/lib/actions/sports"
 
 interface Athlete {
@@ -179,7 +179,6 @@ export function DeleteAthleteDialog({ athlete, trigger, onSuccess }: DeleteAthle
         onSuccess?.()
       }
     } catch (err) {
-      console.error("[v0] Error deleting athlete:", err)
     } finally {
       setIsLoading(false)
     }

@@ -29,7 +29,6 @@ export function LoginForm({ onLogin, onCancel }: LoginFormProps) {
       onLogin(email, password)
     } catch (err) {
       setError("เกิดข้อผิดพลาด")
-      console.error(err)
     } finally {
       setIsLoading(false)
     }

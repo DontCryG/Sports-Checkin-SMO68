@@ -7,16 +7,11 @@ export async function POST(request: Request) {
     const { email, password } = await request.json()
 
     const supabase = await createServerClient()
-    
+
     // Query the users table directly
-    const { data: users, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .limit(1)
+    const { data: users, error } = await supabase.from("users").select("*").eq("email", email).limit(1)
 
     if (error) {
-      console.error("[v0] Database error:", error.message)
       return NextResponse.json({ error: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ" }, { status: 500 })
     }
 
@@ -28,7 +23,7 @@ export async function POST(request: Request) {
 
     // Verify password with bcrypt
     const isPasswordValid = await bcrypt.compare(password, user.password_hash)
-    
+
     if (!isPasswordValid) {
       return NextResponse.json({ error: "รหัสผ่านไม่ถูกต้อง" }, { status: 401 })
     }
@@ -43,7 +38,6 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
-    console.error("[v0] Login error:", error)
     return NextResponse.json({ error: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ" }, { status: 500 })
   }
 }
