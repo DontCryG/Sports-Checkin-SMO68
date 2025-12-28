@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { CheckCircle2, Circle, Users, Trophy, Calendar, ChevronRight, Eye, Search, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ExportButtons } from "@/components/export-buttons"
 import { AthleteManager, DeleteAthleteDialog } from "@/components/athlete-manager"
 import { toggleAthleteCheckIn } from "@/lib/actions/sports"
 import type { Sport, Athlete } from "@/lib/types"
@@ -16,9 +15,10 @@ import type { Sport, Athlete } from "@/lib/types"
 interface SportsCheckInDbProps {
   initialData: Sport[]
   isReadOnly?: boolean
+  userRole?: string
 }
 
-export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheckInDbProps) {
+export function SportsCheckInDb({ initialData, isReadOnly = false, userRole }: SportsCheckInDbProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -317,7 +317,7 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
                 updateURL({ sport: null, category: null, month: null, schedule: null })
               }}
             >
-              ← กลับไปเลือกกีฬา
+              ← กลับไปเลือกกีฬะ
             </Button>
             <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2">
               {sports
@@ -479,7 +479,6 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
                 </div>
               </div>
             </Card>
-
             <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-3 sm:mb-4">เลือกวันที่ต้องการเช็คชื่อ</h3>
             <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {monthSchedules.map((schedule) => {
@@ -598,43 +597,10 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
                     )}
                   </div>
                   <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{currentSchedule.athletes?.length} คน</span>
                     {!isReadOnly && (
                       <AthleteManager scheduleId={selectedScheduleId} mode="add" onSuccess={refreshAthletes} />
                     )}
-                    <ExportButtons
-                      sportName={currentCategory.name}
-                      subcategory={currentCategory.subcategory}
-                      date={currentSchedule.date}
-                      time={currentSchedule.time}
-                      dayOfWeek={currentSchedule.day_of_week}
-                      monthName={currentSchedule.month_name}
-                      athletes={
-                        currentSchedule.athletes?.map((a) => ({
-                          id: a.id,
-                          name: a.name,
-                          number: a.number,
-                          checkedIn: a.checked_in,
-                          faculty: a.faculty,
-                        })) || []
-                      }
-                      monthlySchedules={sortSchedulesByDayOfWeek(monthSchedules).map((s) => ({
-                        id: s.id,
-                        date: s.date,
-                        month: s.month,
-                        monthName: s.month_name,
-                        dayOfWeek: s.day_of_week,
-                        time: s.time,
-                        athletes:
-                          s.athletes?.map((a) => ({
-                            id: a.id,
-                            name: a.name,
-                            number: a.number,
-                            checkedIn: a.checked_in,
-                            faculty: a.faculty,
-                          })) || [],
-                      }))}
-                      isReadOnly={isReadOnly}
-                    />
                   </div>
                 </div>
 
@@ -723,15 +689,15 @@ export function SportsCheckInDb({ initialData, isReadOnly = false }: SportsCheck
                                   )}
                                 </Button>
                                 {!isReadOnly && (
-                                  <>
-                                    <AthleteManager
-                                      scheduleId={selectedScheduleId}
-                                      athlete={athlete}
-                                      mode="edit"
-                                      onSuccess={refreshAthletes}
-                                    />
-                                    <DeleteAthleteDialog athlete={athlete} onSuccess={refreshAthletes} />
-                                  </>
+                                  <AthleteManager
+                                    scheduleId={selectedScheduleId}
+                                    athlete={athlete}
+                                    mode="edit"
+                                    onSuccess={refreshAthletes}
+                                  />
+                                )}
+                                {!isReadOnly && userRole === "admin" && (
+                                  <DeleteAthleteDialog athlete={athlete} onSuccess={refreshAthletes} />
                                 )}
                               </div>
                             </div>

@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -24,10 +25,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger, // Added AlertDialogTrigger import
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { UserPlus, Edit2, Trash2, Loader2 } from "lucide-react"
 import { addAthlete, updateAthlete, deleteAthlete } from "@/lib/actions/sports"
+import { FACULTIES } from "@/lib/constants"
 
 interface Athlete {
   id: string
@@ -54,6 +56,20 @@ export function AthleteManager({ scheduleId, athlete, mode, trigger, onSuccess }
     faculty: athlete?.faculty || "",
   })
   const [error, setError] = useState<string | null>(null)
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    if (isOpen && mode === "edit" && athlete) {
+      setFormData({
+        name: athlete.name,
+        number: athlete.number,
+        faculty: athlete.faculty,
+      })
+    }
+    if (!isOpen) {
+      setError(null)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,7 +99,7 @@ export function AthleteManager({ scheduleId, athlete, mode, trigger, onSuccess }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger || (
           <Button variant={mode === "add" ? "default" : "outline"} size={mode === "add" ? "default" : "sm"}>
@@ -132,14 +148,23 @@ export function AthleteManager({ scheduleId, athlete, mode, trigger, onSuccess }
             </div>
             <div className="grid gap-2">
               <Label htmlFor="faculty">คณะ</Label>
-              <Input
-                id="faculty"
+              <Select
                 value={formData.faculty}
-                onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
-                placeholder="กรอกชื่อคณะ"
-                required
+                onValueChange={(value) => setFormData({ ...formData, faculty: value })}
                 disabled={isLoading}
-              />
+                required
+              >
+                <SelectTrigger id="faculty">
+                  <SelectValue placeholder="เลือกคณะ" />
+                </SelectTrigger>
+                <SelectContent>
+                  {FACULTIES.map((faculty) => (
+                    <SelectItem key={faculty} value={faculty}>
+                      {faculty}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
@@ -147,7 +172,7 @@ export function AthleteManager({ scheduleId, athlete, mode, trigger, onSuccess }
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>
               ยกเลิก
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || !formData.faculty}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {mode === "add" ? "เพิ่ม" : "บันทึก"}
             </Button>

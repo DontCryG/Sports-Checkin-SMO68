@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { verifyAdminSession } from "./auth"
 
 export async function getAllSports() {
   try {
@@ -81,6 +82,10 @@ export async function getAthletesBySchedule(scheduleId: string) {
 
 export async function toggleAthleteCheckIn(athleteId: string, checkedIn: boolean) {
   try {
+    if (!athleteId || typeof checkedIn !== "boolean") {
+      return { success: false, error: "Invalid input" }
+    }
+
     const supabase = await createClient()
 
     const { error } = await supabase.from("athletes").update({ checked_in: checkedIn }).eq("id", athleteId)
@@ -129,10 +134,33 @@ export async function getFullSportsData() {
 
 export async function createSchedule(categoryId: string, date: string, time: string) {
   try {
+    const { isAdmin } = await verifyAdminSession()
+    if (!isAdmin) {
+      return { success: false, error: "ไม่มีสิทธิ์ในการดำเนินการ" }
+    }
+
+    if (!categoryId || !date || !time) {
+      return { success: false, error: "กรุณากรอกข้อมูลให้ครบถ้วน" }
+    }
+
+    const dateObj = new Date(date)
+    if (isNaN(dateObj.getTime())) {
+      return { success: false, error: "รูปแบบวันที่ไม่ถูกต้อง" }
+    }
+
     const supabase = await createClient()
 
-    // Parse date to get month and day of week in Thai
-    const dateObj = new Date(date)
+    const { data: existing } = await supabase
+      .from("schedules")
+      .select("id")
+      .eq("category_id", categoryId)
+      .eq("date", date)
+      .limit(1)
+
+    if (existing && existing.length > 0) {
+      return { success: false, error: "มีตารางซ้อมในวันนี้อยู่แล้ว" }
+    }
+
     const monthNames = [
       "มกราคม",
       "กุมภาพันธ์",
@@ -149,7 +177,7 @@ export async function createSchedule(categoryId: string, date: string, time: str
     ]
     const dayNames = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"]
 
-    const month = dateObj.toISOString().slice(0, 7) // YYYY-MM format
+    const month = dateObj.toISOString().slice(0, 7)
     const monthName = monthNames[dateObj.getMonth()]
     const dayOfWeek = dayNames[dateObj.getDay()]
 
@@ -180,12 +208,19 @@ export async function createSchedule(categoryId: string, date: string, time: str
 
 export async function deleteSchedule(scheduleId: string) {
   try {
+    const { isAdmin } = await verifyAdminSession()
+    if (!isAdmin) {
+      return { success: false, error: "ไม่มีสิทธิ์ในการดำเนินการ" }
+    }
+
+    if (!scheduleId) {
+      return { success: false, error: "Invalid schedule ID" }
+    }
+
     const supabase = await createClient()
 
-    // First delete all athletes associated with this schedule
     await supabase.from("athletes").delete().eq("schedule_id", scheduleId)
 
-    // Then delete the schedule
     const { error } = await supabase.from("schedules").delete().eq("id", scheduleId)
 
     if (error) {
@@ -202,15 +237,19 @@ export async function deleteSchedule(scheduleId: string) {
 
 export async function addAthlete(scheduleId: string, name: string, number: string, faculty: string) {
   try {
+    if (!scheduleId || !name?.trim() || !number?.trim() || !faculty?.trim()) {
+      return { success: false, error: "กรุณากรอกข้อมูลให้ครบถ้วน" }
+    }
+
     const supabase = await createClient()
 
     const { data, error } = await supabase
       .from("athletes")
       .insert({
         schedule_id: scheduleId,
-        name,
-        number,
-        faculty,
+        name: name.trim(),
+        number: number.trim(),
+        faculty: faculty.trim(),
         checked_in: false,
       })
       .select()
@@ -229,9 +268,16 @@ export async function addAthlete(scheduleId: string, name: string, number: strin
 
 export async function updateAthlete(athleteId: string, name: string, number: string, faculty: string) {
   try {
+    if (!athleteId || !name?.trim() || !number?.trim() || !faculty?.trim()) {
+      return { success: false, error: "กรุณากรอกข้อมูลให้ครบถ้วน" }
+    }
+
     const supabase = await createClient()
 
-    const { error } = await supabase.from("athletes").update({ name, number, faculty }).eq("id", athleteId)
+    const { error } = await supabase
+      .from("athletes")
+      .update({ name: name.trim(), number: number.trim(), faculty: faculty.trim() })
+      .eq("id", athleteId)
 
     if (error) {
       return { success: false, error: error.message }
@@ -246,6 +292,10 @@ export async function updateAthlete(athleteId: string, name: string, number: str
 
 export async function deleteAthlete(athleteId: string) {
   try {
+    if (!athleteId) {
+      return { success: false, error: "Invalid athlete ID" }
+    }
+
     const supabase = await createClient()
 
     const { error } = await supabase.from("athletes").delete().eq("id", athleteId)
@@ -270,14 +320,23 @@ export async function createCategory(
   scheduleText?: string,
 ) {
   try {
+    const { isAdmin } = await verifyAdminSession()
+    if (!isAdmin) {
+      return { success: false, error: "ไม่มีสิทธิ์ในการดำเนินการ" }
+    }
+
+    if (!sportId || !name?.trim() || !subcategory?.trim()) {
+      return { success: false, error: "กรุณากรอกข้อมูลให้ครบถ้วน" }
+    }
+
     const supabase = await createClient()
 
     const { data, error } = await supabase
       .from("categories")
       .insert({
         sport_id: sportId,
-        name,
-        subcategory: subcategory || "-",
+        name: name.trim(),
+        subcategory: subcategory.trim(),
         color: color || "#3b82f6",
         icon: icon || "calendar",
         schedule_text: scheduleText || "-",
@@ -299,21 +358,26 @@ export async function createCategory(
 
 export async function deleteCategory(categoryId: string) {
   try {
+    const { isAdmin } = await verifyAdminSession()
+    if (!isAdmin) {
+      return { success: false, error: "ไม่มีสิทธิ์ในการดำเนินการ" }
+    }
+
+    if (!categoryId) {
+      return { success: false, error: "Invalid category ID" }
+    }
+
     const supabase = await createClient()
 
-    // First get all schedules for this category
     const { data: schedules } = await supabase.from("schedules").select("id").eq("category_id", categoryId)
 
-    // Delete all athletes for these schedules
     if (schedules && schedules.length > 0) {
       const scheduleIds = schedules.map((s) => s.id)
       await supabase.from("athletes").delete().in("schedule_id", scheduleIds)
     }
 
-    // Delete all schedules for this category
     await supabase.from("schedules").delete().eq("category_id", categoryId)
 
-    // Finally delete the category
     const { error } = await supabase.from("categories").delete().eq("id", categoryId)
 
     if (error) {

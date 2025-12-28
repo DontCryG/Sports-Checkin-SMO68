@@ -8,15 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { CheckCircle2, Circle, Users, Trophy, Calendar, ChevronRight, Eye, Search } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ExportButtons } from "@/components/export-buttons"
-
-interface Athlete {
-  id: string
-  name: string
-  number: string
-  checkedIn: boolean
-  faculty: string
-}
+import type { Athlete } from "@/lib/types"
 
 interface PracticeSchedule {
   id: string
@@ -1638,17 +1630,6 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                       </p>
                     )}
                   </div>
-                  <ExportButtons
-                    sportName={currentCategory.name}
-                    subcategory={currentCategory.subcategory}
-                    date={currentSchedule.date}
-                    time={currentSchedule.time}
-                    dayOfWeek={currentSchedule.dayOfWeek}
-                    monthName={currentSchedule.monthName}
-                    athletes={currentSchedule.athletes}
-                    monthlySchedules={monthSchedules}
-                    isReadOnly={isReadOnly}
-                  />
                 </div>
 
                 {searchQuery && !hasSearchResults && (
