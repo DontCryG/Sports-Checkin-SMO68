@@ -32,7 +32,6 @@ export function ClientWrapper({ sportsData }: ClientWrapperProps) {
         if (userData.expiresAt && userData.expiresAt > Date.now()) {
           setUser({ name: userData.name, role: userData.role })
         } else {
-          // Session expired, remove it
           localStorage.removeItem("sportsCheckInUser")
         }
       } catch (error) {

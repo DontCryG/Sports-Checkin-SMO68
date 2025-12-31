@@ -317,7 +317,7 @@ export function SportsCheckInDb({ initialData, isReadOnly = false, userRole }: S
                 updateURL({ sport: null, category: null, month: null, schedule: null })
               }}
             >
-              ← กลับไปเลือกกีฬะ
+              ← กลับไปเลือกกีฬู
             </Button>
             <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2">
               {sports
@@ -597,10 +597,10 @@ export function SportsCheckInDb({ initialData, isReadOnly = false, userRole }: S
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">{currentSchedule.athletes?.length} คน</span>
                     {!isReadOnly && (
                       <AthleteManager scheduleId={selectedScheduleId} mode="add" onSuccess={refreshAthletes} />
                     )}
+                    {/* ExportButtons component removed */}
                   </div>
                 </div>
 
@@ -696,7 +696,7 @@ export function SportsCheckInDb({ initialData, isReadOnly = false, userRole }: S
                                     onSuccess={refreshAthletes}
                                   />
                                 )}
-                                {!isReadOnly && userRole === "admin" && (
+                                {userRole === "admin" && (
                                   <DeleteAthleteDialog athlete={athlete} onSuccess={refreshAthletes} />
                                 )}
                               </div>

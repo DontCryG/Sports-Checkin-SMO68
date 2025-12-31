@@ -2,13 +2,22 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { CheckCircle2, Circle, Users, Trophy, Calendar, ChevronRight, Eye, Search } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import type { Athlete } from "@/lib/types"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
+interface Athlete {
+  id: string
+  name: string
+  number: string
+  checkedIn: boolean
+  faculty: string
+}
 
 interface PracticeSchedule {
   id: string
@@ -1268,27 +1277,31 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
         {/* Stats Overview */}
         <div className="mb-4 md:mb-6 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
           <Card className="border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="rounded-xl bg-primary/20 p-2 sm:p-3">
-                <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">ประเภทกีฬา</p>
-                <p className="text-xl sm:text-2xl font-bold text-card-foreground">{totalCategories}</p>
-              </div>
-            </div>
+            <CardHeader className="p-0 mb-3 sm:mb-4">
+              <CardTitle className="flex items-center gap-3 sm:gap-4 text-base sm:text-lg font-medium text-muted-foreground">
+                <div className="rounded-xl bg-primary/20 p-2 sm:p-3">
+                  <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                ประเภทกีฬา
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <p className="text-xl sm:text-2xl font-bold text-card-foreground">{totalCategories}</p>
+            </CardContent>
           </Card>
 
           <Card className="border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="rounded-xl bg-primary/20 p-2 sm:p-3">
-                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">นักกีฬาทั้งหมด</p>
-                <p className="text-xl sm:text-2xl font-bold text-card-foreground">{totalAthletes}</p>
-              </div>
-            </div>
+            <CardHeader className="p-0 mb-3 sm:mb-4">
+              <CardTitle className="flex items-center gap-3 sm:gap-4 text-base sm:text-lg font-medium text-muted-foreground">
+                <div className="rounded-xl bg-primary/20 p-2 sm:p-3">
+                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                นักกีฬาทั้งหมด
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <p className="text-xl sm:text-2xl font-bold text-card-foreground">{totalAthletes}</p>
+            </CardContent>
           </Card>
         </div>
 
@@ -1304,8 +1317,8 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                   updateURL({ sport: sport.id, category: null, month: null, schedule: null })
                 }}
               >
-                <div className="p-4 sm:p-6">
-                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <CardHeader className="p-4 sm:p-6 pb-0">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 sm:gap-4">
                       <div className="text-3xl sm:text-4xl md:text-5xl">{sport.icon}</div>
                       <div>
@@ -1315,6 +1328,8 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                     </div>
                     <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
                   <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {sport.categories.map((cat) => (
                       <Badge key={cat.id} variant="secondary" className="text-xs">
@@ -1322,7 +1337,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                       </Badge>
                     ))}
                   </div>
-                </div>
+                </CardContent>
               </Card>
             ))}
           </div>
@@ -1355,7 +1370,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                       updateURL({ sport: selectedMainSport, category: category.id, month: null, schedule: null })
                     }}
                   >
-                    <div className={`bg-gradient-to-r ${category.color} p-4 sm:p-6 rounded-t-xl`}>
+                    <CardHeader className={`bg-gradient-to-r ${category.color} p-4 sm:p-6 rounded-t-xl`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 sm:gap-4">
                           <div className="text-3xl sm:text-4xl">{category.icon}</div>
@@ -1366,15 +1381,15 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                         </div>
                         <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-white group-hover:translate-x-1 transition-transform flex-shrink-0" />
                       </div>
-                    </div>
-                    <div className="p-4 sm:p-6">
+                    </CardHeader>
+                    <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between">
                         <p className="text-xs sm:text-sm text-muted-foreground">ตารางฝึกซ้อม</p>
                         <p className="text-base sm:text-lg font-bold text-card-foreground">
                           {category.schedules.length} วัน
                         </p>
                       </div>
-                    </div>
+                    </CardContent>
                   </Card>
                 ))}
             </div>
@@ -1397,7 +1412,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
               ← กลับไปเลือกประเภท
             </Button>
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm mb-4 sm:mb-6">
-              <div className={`bg-gradient-to-r ${currentCategory.color} p-4 sm:p-6 rounded-t-xl`}>
+              <CardHeader className={`bg-gradient-to-r ${currentCategory.color} p-4 sm:p-6 rounded-t-xl`}>
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="text-3xl sm:text-4xl md:text-5xl">{currentCategory.icon}</div>
                   <div>
@@ -1407,7 +1422,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                     <p className="text-xs sm:text-sm text-purple-100">{currentCategory.scheduleText}</p>
                   </div>
                 </div>
-              </div>
+              </CardHeader>
             </Card>
 
             <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-3 sm:mb-4">เลือกเดือนที่ต้องการดูตาราง</h3>
@@ -1430,7 +1445,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                       updateURL({ sport: selectedMainSport, category: selectedCategory, month, schedule: null })
                     }}
                   >
-                    <div className="p-4 sm:p-6">
+                    <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div className="flex items-center gap-2 sm:gap-3">
                           <div className="rounded-lg bg-primary/20 p-2 sm:p-3">
@@ -1460,7 +1475,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                           />
                         </div>
                       </div>
-                    </div>
+                    </CardContent>
                   </Card>
                 )
               })}
@@ -1485,7 +1500,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
 
             {/* Sport Header Card - separate from schedule grid */}
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm mb-4 sm:mb-6">
-              <div className={`bg-gradient-to-r ${currentCategory.color} p-4 sm:p-6 rounded-t-xl`}>
+              <CardHeader className={`bg-gradient-to-r ${currentCategory.color} p-4 sm:p-6 rounded-t-xl`}>
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="text-3xl sm:text-4xl md:text-5xl">{currentCategory.icon}</div>
                   <div>
@@ -1497,7 +1512,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                     </p>
                   </div>
                 </div>
-              </div>
+              </CardHeader>
             </Card>
 
             {/* Schedule selection heading and grid - no wrapping card */}
@@ -1522,7 +1537,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                       })
                     }}
                   >
-                    <div className="p-4 sm:p-6">
+                    <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div className="flex items-center gap-2 sm:gap-3">
                           <div className="rounded-lg bg-primary/20 p-2 sm:p-3">
@@ -1550,7 +1565,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                           <div className="h-full bg-primary transition-all" style={{ width: `${percentage}%` }} />
                         </div>
                       </div>
-                    </div>
+                    </CardContent>
                   </Card>
                 )
               })}
@@ -1579,7 +1594,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
             </Button>
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               {/* Sport Header */}
-              <div className={`bg-gradient-to-r ${currentCategory.color} p-4 sm:p-6 rounded-t-xl`}>
+              <CardHeader className={`bg-gradient-to-r ${currentCategory.color} p-4 sm:p-6 rounded-t-xl`}>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div className="text-3xl sm:text-4xl md:text-5xl">{currentCategory.icon}</div>
@@ -1599,9 +1614,9 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                     <p className="text-xs sm:text-sm text-purple-100">เช็คชื่อแล้ว</p>
                   </div>
                 </div>
-              </div>
+              </CardHeader>
 
-              <div className="p-3 sm:p-4 md:p-6">
+              <CardContent className="p-3 sm:p-4 md:p-6">
                 <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                   <div className="flex-1 w-full">
                     <div className="relative">
@@ -1630,6 +1645,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                       </p>
                     )}
                   </div>
+                  {/* Export Buttons removed as per updates */}
                 </div>
 
                 {searchQuery && !hasSearchResults && (
@@ -1651,80 +1667,116 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                 )}
 
                 {hasSearchResults && (
-                  <div className="space-y-6">
-                    {faculties.map((faculty) => (
-                      <div key={faculty}>
-                        {/* Faculty Header */}
-                        <div className="mb-3 flex items-center gap-2 border-b border-primary/20 pb-2">
-                          <Users className="h-5 w-5 text-primary" />
-                          <h3 className="text-base sm:text-lg font-bold text-card-foreground">{faculty}</h3>
-                          <Badge variant="secondary" className="ml-auto text-xs">
-                            {filteredAthletesByFaculty[faculty].filter((a) => a.checkedIn).length}/
-                            {filteredAthletesByFaculty[faculty].length}
-                          </Badge>
-                        </div>
+                  <ScrollArea className="h-[50vh] sm:h-[60vh] pr-3">
+                    <div className="space-y-6 mr-3">
+                      {faculties.map((faculty) => (
+                        <div key={faculty}>
+                          {/* Faculty Header */}
+                          <div className="mb-3 flex items-center gap-2 border-b border-primary/20 pb-2">
+                            <Users className="h-5 w-5 text-primary" />
+                            <h3 className="text-base sm:text-lg font-bold text-card-foreground">{faculty}</h3>
+                            <Badge variant="secondary" className="ml-auto text-xs">
+                              {filteredAthletesByFaculty[faculty].filter((a) => a.checkedIn).length}/
+                              {filteredAthletesByFaculty[faculty].length}
+                            </Badge>
+                          </div>
 
-                        {/* Athletes in this faculty */}
-                        <div className="space-y-2 sm:space-y-3">
-                          {filteredAthletesByFaculty[faculty].map((athlete) => (
-                            <div
-                              key={athlete.id}
-                              className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 rounded-lg border p-3 sm:p-4 transition-all hover:border-primary/50 ${
-                                athlete.checkedIn ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/30"
-                              }`}
-                            >
-                              <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                                <div
-                                  className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg font-bold text-xs sm:text-sm flex-shrink-0 ${
-                                    athlete.checkedIn
-                                      ? "bg-primary text-primary-foreground"
-                                      : "bg-secondary text-secondary-foreground"
-                                  }`}
-                                >
-                                  {athlete.number}
+                          {/* Athletes in this faculty */}
+                          <div className="space-y-2 sm:space-y-3">
+                            {filteredAthletesByFaculty[faculty].map((athlete) => (
+                              <div
+                                key={athlete.id}
+                                className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 rounded-lg border p-3 sm:p-4 transition-all hover:border-primary/50 ${
+                                  athlete.checkedIn ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/30"
+                                }`}
+                              >
+                                <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                                  <div
+                                    className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg font-bold text-xs sm:text-sm flex-shrink-0 ${
+                                      athlete.checkedIn
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-secondary text-secondary-foreground"
+                                    }`}
+                                  >
+                                    {athlete.number}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="font-semibold text-card-foreground text-sm sm:text-base truncate">
+                                      {athlete.name}
+                                    </p>
+                                    <p className="text-xs sm:text-sm text-muted-foreground">เบอร์ {athlete.number}</p>
+                                  </div>
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="font-semibold text-card-foreground text-sm sm:text-base truncate">
-                                    {athlete.name}
-                                  </p>
-                                  <p className="text-xs sm:text-sm text-muted-foreground">เบอร์ {athlete.number}</p>
-                                </div>
-                              </div>
 
-                              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
-                                {athlete.checkedIn && (
-                                  <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
-                                    เข้าร่วมแล้ว
-                                  </Badge>
-                                )}
-                                <Button
-                                  variant={athlete.checkedIn ? "outline" : "default"}
-                                  size="sm"
-                                  onClick={() => toggleCheckIn(currentCategory.id, currentSchedule.id, athlete.id)}
-                                  disabled={isReadOnly}
-                                  className={`text-xs sm:text-sm ${athlete.checkedIn ? "border-primary/30 hover:bg-primary/10" : ""} ${isReadOnly ? "opacity-50 cursor-not-allowed" : ""}`}
-                                >
-                                  {athlete.checkedIn ? (
-                                    <>
-                                      <CheckCircle2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                                      {isReadOnly ? "เข้าร่วมแล้ว" : "ยกเลิก"}
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Circle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                                      {isReadOnly ? "ยังไม่เข้าร่วม" : "เช็คชื่อ"}
-                                    </>
+                                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+                                  {athlete.checkedIn && (
+                                    <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
+                                      เข้าร่วมแล้ว
+                                    </Badge>
                                   )}
-                                </Button>
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        variant={athlete.checkedIn ? "outline" : "default"}
+                                        size="sm"
+                                        disabled={isReadOnly}
+                                        className={`text-xs sm:text-sm ${athlete.checkedIn ? "border-primary/30 hover:bg-primary/10" : ""} ${isReadOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                                      >
+                                        {athlete.checkedIn ? (
+                                          <>
+                                            <CheckCircle2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                            {isReadOnly ? "เข้าร่วมแล้ว" : "ยกเลิก"}
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Circle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                            {isReadOnly ? "ยังไม่เข้าร่วม" : "เช็คชื่อ"}
+                                          </>
+                                        )}
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                      <DialogHeader>
+                                        <DialogTitle>ยืนยันการเปลี่ยนแปลงสถานะ</DialogTitle>
+                                      </DialogHeader>
+                                      <DialogContent>
+                                        <p className="text-sm text-muted-foreground mb-4">
+                                          คุณต้องการเปลี่ยนสถานะการเข้าร่วมของ{" "}
+                                          <span className="font-semibold">{athlete.name}</span> ({athlete.number}) จาก{" "}
+                                          <span className="font-semibold">
+                                            {athlete.checkedIn ? "เข้าร่วมแล้ว" : "ยังไม่เข้าร่วม"}
+                                          </span>{" "}
+                                          เป็น{" "}
+                                          <span className="font-semibold">
+                                            {!athlete.checkedIn ? "เข้าร่วมแล้ว" : "ยังไม่เข้าร่วม"}
+                                          </span>{" "}
+                                          ใช่หรือไม่?
+                                        </p>
+                                        <div className="flex justify-end gap-2">
+                                          <Button variant="outline" onClick={() => {}}>
+                                            ยกเลิก
+                                          </Button>
+                                          <Button
+                                            onClick={() =>
+                                              toggleCheckIn(currentCategory.id, currentSchedule.id, athlete.id)
+                                            }
+                                          >
+                                            ยืนยัน
+                                          </Button>
+                                        </div>
+                                      </DialogContent>
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
                 )}
-              </div>
+              </CardContent>
             </Card>
           </div>
         )}
