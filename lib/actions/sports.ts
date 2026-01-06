@@ -292,6 +292,11 @@ export async function updateAthlete(athleteId: string, name: string, number: str
 
 export async function deleteAthlete(athleteId: string) {
   try {
+    const { isAdmin } = await verifyAdminSession()
+    if (!isAdmin) {
+      return { success: false, error: "ไม่มีสิทธิ์ในการดำเนินการ" }
+    }
+
     if (!athleteId) {
       return { success: false, error: "Invalid athlete ID" }
     }
