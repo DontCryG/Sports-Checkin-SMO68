@@ -18,9 +18,9 @@ export function Footer() {
           <div className="sm:col-span-2 md:col-span-1">
             <h3 className="mb-2 text-sm font-semibold text-foreground">ลิงก์ที่เป็นประโยชน์</h3>
             <ul className="space-y-1 text-xs text-muted-foreground">
-              <li>คู่มือการใช้งาน</li>
+              
               <li>กฎกติกากีฬา</li>
-              <li>ตารางการแข่งขัน</li>
+              
             </ul>
           </div>
         </div>
