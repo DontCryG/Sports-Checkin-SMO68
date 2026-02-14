@@ -317,7 +317,7 @@ export function SportsCheckInDb({ initialData, isReadOnly = false, userRole }: S
                 updateURL({ sport: null, category: null, month: null, schedule: null })
               }}
             >
-              ← กลับไปเลือกกีฬู
+              ← กลับไปเลือกกีฬา
             </Button>
             <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2">
               {sports
