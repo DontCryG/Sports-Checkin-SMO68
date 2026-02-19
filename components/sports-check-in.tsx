@@ -1262,7 +1262,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
           <h1 className="mb-2 text-2xl sm:text-3xl md:text-4xl font-bold text-balance bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
             ระบบเช็คชื่อตารางกีฬา
           </h1>
-          <p className="text-muted-foreground text-sm sm:text-base md:text-lg">ติดตามการเข้าร่วมฝึกซ้อมของนักกีฬาแต่ละประเภท</p>
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg">ติดตามการเข้าร่วมการแข่งขันของนักกีฬาแต่ละประเภท</p>
         </div>
 
         {isReadOnly && (
@@ -1384,7 +1384,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                     </CardHeader>
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs sm:text-sm text-muted-foreground">ตารางฝึกซ้อม</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">ตารางการแข่ง</p>
                         <p className="text-base sm:text-lg font-bold text-card-foreground">
                           {category.schedules.length} วัน
                         </p>
@@ -1455,7 +1455,7 @@ export function SportsCheckIn({ isReadOnly = false }: { isReadOnly?: boolean }) 
                             <h4 className="text-base sm:text-lg md:text-xl font-bold text-card-foreground">
                               {monthName}
                             </h4>
-                            <p className="text-xs sm:text-sm text-muted-foreground">{monthScheduleCount} วันฝึกซ้อม</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{monthScheduleCount} วันแข่งขัน</p>
                           </div>
                         </div>
                         <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />

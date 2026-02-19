@@ -47,7 +47,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
     try {
       const result = await createSchedule(selectedCategoryId, date, time)
       if (result.success) {
-        alert("เพิ่มวันซ้อมสำเร็จ!")
+        alert("เพิ่มวันแข่งสำเร็จ!")
         setIsAddDialogOpen(false)
         setSelectedSportId("")
         setSelectedCategoryId("")
@@ -58,7 +58,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
         alert(result.error || "เกิดข้อผิดพลาด")
       }
     } catch (error) {
-      alert("เกิดข้อผิดพลาดในการเพิ่มวันซ้อม")
+      alert("เกิดข้อผิดพลาดในการเพิ่มวันแข่ง")
     } finally {
       setIsLoading(false)
     }
@@ -91,7 +91,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
   }
 
   const handleDeleteCategory = async (categoryId: string, categoryName: string) => {
-    if (!confirm(`คุณแน่ใจหรือไม่ที่จะลบหมวดหมู่ "${categoryName}"? ตารางซ้อมและนักกีฬาทั้งหมดในหมวดหมู่นี้จะถูกลบด้วย`)) return
+    if (!confirm(`คุณแน่ใจหรือไม่ที่จะลบหมวดหมู่ "${categoryName}"? ตารางแข่งและนักกีฬาทั้งหมดในหมวดหมู่นี้จะถูกลบด้วย`)) return
 
     setIsLoading(true)
     try {
@@ -110,19 +110,19 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
   }
 
   const handleDeleteSchedule = async (scheduleId: string) => {
-    if (!confirm("คุณแน่ใจหรือไม่ที่จะลบวันซ้อมนี้? นักกีฬาทั้งหมดในวันนี้จะถูกลบด้วย")) return
+    if (!confirm("คุณแน่ใจหรือไม่ที่จะลบวันแข่งนี้? นักกีฬาทั้งหมดในวันนี้จะถูกลบด้วย")) return
 
     setIsLoading(true)
     try {
       const result = await deleteSchedule(scheduleId)
       if (result.success) {
-        alert("ลบวันซ้อมสำเร็จ!")
+        alert("ลบวันแข่งสำเร็จ!")
         loadSports()
       } else {
         alert(result.error || "เกิดข้อผิดพลาด")
       }
     } catch (error) {
-      alert("เกิดข้อผิดพลาดในการลบวันซ้อม")
+      alert("เกิดข้อผิดพลาดในการลบวันแข่ง")
     } finally {
       setIsLoading(false)
     }
@@ -177,7 +177,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">จัดการประเภทกีฬาและตารางฝึกซ้อม</p>
+          <p className="text-muted-foreground">จัดการประเภทกีฬาและตารางการแข่ง</p>
         </div>
         <Link href="/">
           <Button variant="outline" className="gap-2 bg-transparent">
@@ -245,12 +245,12 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              เพิ่มวันซ้อมใหม่
+              เพิ่มวันแข่งใหม่
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>เพิ่มวันซ้อมใหม่</DialogTitle>
+              <DialogTitle>เพิ่มวันแข่งใหม่</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -296,7 +296,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
               </div>
 
               <Button onClick={handleAddSchedule} disabled={isLoading} className="w-full">
-                {isLoading ? "กำลังเพิ่ม..." : "เพิ่มวันซ้อม"}
+                {isLoading ? "กำลังเพิ่ม..." : "เพิ่มวันแข่ง"}
               </Button>
             </div>
           </DialogContent>
@@ -308,7 +308,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
           <Card key={sport.id}>
             <CardHeader>
               <CardTitle>{sport.name}</CardTitle>
-              <CardDescription>จัดการหมวดหมู่และตารางซ้อม</CardDescription>
+              <CardDescription>จัดการหมวดหมู่และตารางแข่ง</CardDescription>
             </CardHeader>
             <CardContent>
               {sport.categories?.map((category) => {
@@ -401,7 +401,7 @@ export function AdminDashboard({ sportsData: initialSportsData }: AdminDashboard
                         })}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground py-2">ยังไม่มีตารางซ้อม</p>
+                      <p className="text-sm text-muted-foreground py-2">ยังไม่มีตารางแข่ง</p>
                     )}
                   </div>
                 )
